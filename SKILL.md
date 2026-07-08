@@ -34,6 +34,8 @@ services/<name>    MCP/service registration docs and examples
 projects/<name>    source code, build, tests, runtime
 ```
 
+Some team projects are intentionally just standalone repositories, not Freedom OS hybrid capabilities. For these simple repo projects, do not force the `skills/services/projects` model. The onboarding job is only to clone the repository into the standard workspace, tell the user how to open that folder in Codex, and then guide update/commit/push workflow from inside that repository.
+
 Do not assume `npx skills add` makes a TypeScript project usable. Skill installation only installs instructions. Project runtime still needs dependency install, setup, build, verification, and MCP registration.
 
 ## Standard local paths
@@ -100,6 +102,37 @@ git pull --ff-only
 Detailed procedure: `references/capability-install.md`.
 
 For todo-dashboard: `references/todo-dashboard.md`.
+
+## Simple standalone repo flow
+
+Use this for projects like `alphahelper` when the user only needs a local checkout and Codex development guidance.
+
+1. Check Git and GitHub access.
+2. Clone the standalone repo into the standard workspace:
+
+```bash
+mkdir -p ~/Code/github.com/way2freedom
+cd ~/Code/github.com/way2freedom
+git clone git@github.com:way2freedom/<repo>.git
+```
+
+3. Tell the user to open that folder in Codex:
+
+```bash
+cd ~/Code/github.com/way2freedom/<repo>
+codex
+```
+
+4. For future updates:
+
+```bash
+git status --short
+git pull --ff-only
+```
+
+5. For code changes, follow `references/contribution-workflow.md` in that repo context: inspect status, edit scoped files, run relevant verification, then commit/push only when the user explicitly asks.
+
+Do not install a thin skill, register MCP, or run project setup unless the standalone repo's README/AGENTS/service manifest explicitly says that is required.
 
 ## Update and contribution flow
 

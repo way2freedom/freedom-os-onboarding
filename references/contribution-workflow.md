@@ -1,8 +1,10 @@
 # 更新、修改和提交代码规范
 
-当用户要求更新团队仓库、修改能力、提交代码或推送远程时，按本流程执行。
+当用户要求更新团队仓库、修改能力、提交代码或推送远程时，按本流程执行。这个流程也适用于 `alphahelper` 这类简单独立 repo：先让用户在 Codex 中打开该 repo 文件夹，再在该 repo 内执行更新、验证、提交和推送。
 
 ## 1. 更新仓库
+
+### 团队 skills 仓库
 
 ```bash
 cd ~/Code/github.com/way2freedom/skills
@@ -10,6 +12,26 @@ git status --short
 git fetch origin
 git checkout v3
 git pull --ff-only
+```
+
+### 简单独立 repo
+
+例如 `alphahelper`：
+
+```bash
+cd ~/Code/github.com/way2freedom/alphahelper
+git status --short
+git pull --ff-only
+```
+
+如果本地还没有 clone：
+
+```bash
+mkdir -p ~/Code/github.com/way2freedom
+cd ~/Code/github.com/way2freedom
+git clone git@github.com:way2freedom/alphahelper.git
+cd alphahelper
+codex
 ```
 
 如果工作区已有未提交改动，先告诉用户，不要直接覆盖。

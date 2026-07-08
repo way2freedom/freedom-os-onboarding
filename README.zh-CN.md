@@ -43,6 +43,27 @@ projects/<name>    项目源码和运行时：依赖、构建、测试、启动
 注册 MCP 才代表 Codex/Hermes 可以调用工具。
 ```
 
+也有一类项目只是独立代码仓库，例如 `alphahelper`。这类项目不需要强行拆成 skill / MCP / project 三层。onboarding 只需要：
+
+```text
+检查 Git/GitHub 权限
+clone 独立 repo 到标准目录
+提示用户在 Codex 中打开该文件夹
+后续指导如何更新、修改、验证、提交和推送
+```
+
+例如：
+
+```bash
+mkdir -p ~/Code/github.com/way2freedom
+cd ~/Code/github.com/way2freedom
+git clone git@github.com:way2freedom/alphahelper.git
+cd alphahelper
+codex
+```
+
+除非该 repo 自己的 `README.md` / `AGENTS.md` / `service.json` 明确要求，否则不要自动安装 skill、注册 MCP 或执行项目 setup。
+
 ## 通用安装方式
 
 如果这个 onboarding 仓库已经 clone 到本地，可以运行：
