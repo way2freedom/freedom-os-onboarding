@@ -147,6 +147,7 @@ Key rules:
 - Pull with `git pull --ff-only` before editing.
 - Do not commit or push unless the user explicitly asks.
 - Keep changes scoped to the task.
+- Keep Chinese documentation synchronized with English documentation. When updating `README.md` or other user-facing English docs, update `README.zh-CN.md` or the corresponding Chinese section in the same change.
 - Run relevant verification before claiming done.
 - Never commit secrets, `.env`, tokens, cookies, personal local paths, or credentials.
 
