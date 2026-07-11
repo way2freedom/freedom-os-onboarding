@@ -8,7 +8,7 @@ if [ $# -lt 1 ] || [ $# -gt 2 ]; then
 fi
 
 name=$1
-repo_root=${2:-${FREEDOM_OS_REPO:-$HOME/Code/github.com/way2freedom/skills}}
+repo_root=${2:-${FREEDOM_OS_REPO:-$HOME/Code/github.com/way2freedom/freedom-os}}
 repo_parent=$(dirname "$repo_root")
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
@@ -19,7 +19,7 @@ fi
 
 mkdir -p "$repo_parent"
 if [ ! -d "$repo_root/.git" ]; then
-  git clone git@github.com:way2freedom/skills.git "$repo_root"
+  git clone git@github.com:way2freedom/freedom-os.git "$repo_root"
 fi
 
 cd "$repo_root"

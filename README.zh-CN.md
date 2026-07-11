@@ -9,19 +9,19 @@
 Codex 默认：
 
 ```bash
-npx skills add way2freedom/freedom-os-onboarding --skill freedom-os-onboarding -a codex
+npx skills add way2freedom/freedom-os-manager --skill freedom-os-manager -a codex
 ```
 
 Codex + Hermes：
 
 ```bash
-npx skills add way2freedom/freedom-os-onboarding --skill freedom-os-onboarding -a codex -a hermes-agent
+npx skills add way2freedom/freedom-os-manager --skill freedom-os-manager -a codex -a hermes-agent
 ```
 
 安装后，打开 Codex，说：
 
 ```text
-使用 freedom-os-onboarding 帮我安装 todo-dashboard。
+使用 freedom-os-manager 帮我安装 todo-dashboard。
 自动检测我本机有哪些 Agent。如果缺少 Git 或 GitHub 权限，请一步步引导我配置。
 ```
 
@@ -69,14 +69,14 @@ codex
 如果这个 onboarding 仓库已经 clone 到本地，可以运行：
 
 ```bash
-./skills/freedom-os-onboarding/scripts/install-capability.sh todo-dashboard
+./skills/freedom-os-manager/scripts/install-capability.sh todo-dashboard
 ```
 
 它会：
 
-> 本仓库把技能包放在 `skills/freedom-os-onboarding/` 目录下，确保通过 `npx skills` 从 GitHub 安装时会连同 `references/` 和 `scripts/` 一起安装。
+> 本仓库把技能包放在 `skills/freedom-os-manager/` 目录下，确保通过 `npx skills` 从 GitHub 安装时会连同 `references/` 和 `scripts/` 一起安装。
 
-1. clone 或更新 `way2freedom/skills`。
+1. clone 或更新 `way2freedom/freedom-os`。
 2. 自动检测 `codex` / `hermes`。
 3. 如果存在 `skills/<name>`，安装 thin skill 到可用 Agent。
 4. 如果存在 `projects/<name>`，执行 `corepack enable`、`pnpm install`、`pnpm setup`、`pnpm check`、`pnpm build`、`pnpm test`、`pnpm run doctor`。
@@ -87,7 +87,7 @@ codex
 当需要更新团队仓库：
 
 ```bash
-cd ~/Code/github.com/way2freedom/skills
+cd ~/Code/github.com/way2freedom/freedom-os
 git fetch origin
 git checkout v3
 git pull --ff-only
@@ -107,7 +107,7 @@ git commit -m "type: concise subject"
 git push origin <branch>
 ```
 
-详细规则见：`skills/freedom-os-onboarding/references/contribution-workflow.md`。
+详细规则见：`skills/freedom-os-manager/references/contribution-workflow.md`。
 
 ## 安全规则
 

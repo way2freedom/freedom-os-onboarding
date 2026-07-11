@@ -1,5 +1,5 @@
 ---
-name: freedom-os-onboarding
+name: freedom-os-manager
 description: "Use first for Freedom OS / way2freedom setup and capability installation from Codex or Hermes: Git/GitHub setup, repo clone/update, thin skill install, project runtime setup, MCP registration, update, and contribution workflow."
 version: 0.2.0
 type: pure-skill
@@ -16,7 +16,7 @@ capabilities:
   - contribution-workflow
 ---
 
-# Freedom OS Onboarding
+# Freedom OS Manager
 
 Use this skill first when a user asks to set up Freedom OS, install or update a way2freedom/Freedom OS skill or capability, prepare a team repo, register MCPs, or modify and submit team code.
 
@@ -45,7 +45,7 @@ Do not assume `npx skills add` makes a TypeScript project usable. Skill installa
 Use this default team path unless the user asks otherwise:
 
 ```text
-~/Code/github.com/way2freedom/skills
+~/Code/github.com/way2freedom/freedom-os
 ```
 
 ## Detection flow
@@ -89,7 +89,7 @@ For any capability `<name>` in the team repo:
 mkdir -p ~/Code/github.com/way2freedom
 cd ~/Code/github.com/way2freedom
 if [ ! -d skills/.git ]; then
-  git clone git@github.com:way2freedom/skills.git
+  git clone git@github.com:way2freedom/freedom-os.git
 fi
 cd skills
 git checkout v3

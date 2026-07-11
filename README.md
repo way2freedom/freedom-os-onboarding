@@ -1,4 +1,4 @@
-# Freedom OS Onboarding
+# Freedom OS Manager
 
 中文文档见：[README.zh-CN.md](README.zh-CN.md)。
 
@@ -11,19 +11,19 @@ This repository is intentionally small and public. New members install this skil
 Default path for new members who already have Codex installed and logged in:
 
 ```bash
-npx skills add way2freedom/freedom-os-onboarding --skill freedom-os-onboarding -a codex
+npx skills add way2freedom/freedom-os-manager --skill freedom-os-manager -a codex
 ```
 
 If both Codex and Hermes Agent are installed, install to both:
 
 ```bash
-npx skills add way2freedom/freedom-os-onboarding --skill freedom-os-onboarding -a codex -a hermes-agent
+npx skills add way2freedom/freedom-os-manager --skill freedom-os-manager -a codex -a hermes-agent
 ```
 
 After installing, open Codex and say:
 
 ```text
-Use the freedom-os-onboarding skill to install todo-dashboard.
+Use the freedom-os-manager skill to install todo-dashboard.
 Detect my available agents automatically. If Git or GitHub access is missing, guide me step by step.
 ```
 
@@ -54,17 +54,17 @@ cd alphahelper
 codex
 ```
 
-Unless the standalone repo's own `README.md`, `AGENTS.md`, or service manifest says otherwise, do not install a thin skill, register MCP, run project setup/build, or copy it into `way2freedom/skills/projects`.
+Unless the standalone repo's own `README.md`, `AGENTS.md`, or service manifest says otherwise, do not install a thin skill, register MCP, run project setup/build, or copy it into `way2freedom/freedom-os/projects`.
 
-This onboarding skill can guide all three:
+This manager skill can guide all three:
 
 ```bash
-./skills/freedom-os-onboarding/scripts/install-capability.sh todo-dashboard
+./skills/freedom-os-manager/scripts/install-capability.sh todo-dashboard
 ```
 
 The script:
 
-1. Clones or updates `way2freedom/skills`.
+1. Clones or updates `way2freedom/freedom-os`.
 2. Installs `skills/<name>` to detected agents.
 3. Prepares `projects/<name>` when present.
 4. Registers MCP for Codex when available.
@@ -78,7 +78,7 @@ It guides an agent through:
 2. Checking Git, Node, Corepack, and pnpm.
 3. Configuring Git identity if missing.
 4. Setting up GitHub access with `gh`, SSH, or HTTPS credentials.
-5. Cloning `way2freedom/skills` into `~/Code/github.com/way2freedom/skills`.
+5. Cloning `way2freedom/freedom-os` into `~/Code/github.com/way2freedom/freedom-os`.
 6. Installing requested thin skills into available agents.
 7. Preparing project runtime, for example `projects/todo-dashboard`.
 8. Registering MCP servers for Codex and/or Hermes.
@@ -88,9 +88,9 @@ It guides an agent through:
 ## Repository layout
 
 ```text
-README.md                         English onboarding guide
-README.zh-CN.md                   Chinese onboarding guide
-skills/freedom-os-onboarding/
+README.md                         English manager guide
+README.zh-CN.md                   Chinese manager guide
+skills/freedom-os-manager/
   SKILL.md                        bootstrap skill entrypoint
   references/
     capability-install.md         generic skill/service/project installation flow
@@ -105,7 +105,7 @@ skills/freedom-os-onboarding/
     bootstrap-todo-dashboard.sh   compatibility wrapper for todo-dashboard
 ```
 
-The skill lives under `skills/freedom-os-onboarding/` instead of the repository root so `npx skills` installs the complete skill package, including `references/` and `scripts/`, when installing from GitHub.
+The skill lives under `skills/freedom-os-manager/` instead of the repository root so `npx skills` installs the complete skill package, including `references/` and `scripts/`, when installing from GitHub.
 
 ## Safety
 

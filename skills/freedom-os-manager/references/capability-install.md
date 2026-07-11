@@ -1,6 +1,6 @@
 # 通用能力安装：Skill / MCP / Project
 
-适用于团队仓库 `way2freedom/skills` 中任意能力 `<name>`。
+适用于团队仓库 `way2freedom/freedom-os` 中任意能力 `<name>`。
 
 ## 目录含义
 
@@ -16,7 +16,7 @@ projects/<name>    项目源码、依赖、构建、测试和运行时
 - 纯 MCP：可能有 `services/<name>`，也可能有独立源码。
 - 完整项目：通常有 `projects/<name>`。
 - hybrid 能力：三层都有，但 skill/service 保持薄，project 是唯一源码真相。
-- 简单独立 repo：不在 `way2freedom/skills` 仓库内，不需要安装 skill/MCP/project，只 clone 到标准目录并提示在 Codex 中打开。
+- 简单独立 repo：不在 `way2freedom/freedom-os` 仓库内，不需要安装 skill/MCP/project，只 clone 到标准目录并提示在 Codex 中打开。
 
 ## 简单独立 repo 项目
 
@@ -57,7 +57,7 @@ codex
 npx skills add
 MCP 注册
 pnpm setup / build / doctor
-复制源码到 way2freedom/skills/projects
+复制源码到 way2freedom/freedom-os/projects
 ```
 
 ## 1. clone 或更新团队仓库
@@ -66,7 +66,7 @@ pnpm setup / build / doctor
 mkdir -p ~/Code/github.com/way2freedom
 cd ~/Code/github.com/way2freedom
 if [ ! -d skills/.git ]; then
-  git clone git@github.com:way2freedom/skills.git
+  git clone git@github.com:way2freedom/freedom-os.git
 fi
 cd skills
 git checkout v3

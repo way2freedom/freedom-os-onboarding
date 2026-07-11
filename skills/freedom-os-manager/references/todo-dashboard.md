@@ -8,7 +8,7 @@ Use this when the user asks to install `todo-dashboard` for Freedom OS.
 mkdir -p ~/Code/github.com/way2freedom
 cd ~/Code/github.com/way2freedom
 if [ ! -d skills/.git ]; then
-  git clone git@github.com:way2freedom/skills.git
+  git clone git@github.com:way2freedom/freedom-os.git
 fi
 cd skills
 git checkout v3
@@ -18,7 +18,7 @@ git pull --ff-only
 If SSH is not configured and the repo is public, HTTPS is acceptable:
 
 ```bash
-git clone https://github.com/way2freedom/skills.git
+git clone https://github.com/way2freedom/freedom-os.git
 ```
 
 ## 2. Detect target agents
@@ -55,7 +55,7 @@ npx skills add ./skills/todo-dashboard -a codex -a hermes-agent
 ## 4. Prepare runtime
 
 ```bash
-cd ~/Code/github.com/way2freedom/skills/projects/todo-dashboard
+cd ~/Code/github.com/way2freedom/freedom-os/projects/todo-dashboard
 corepack enable
 pnpm install
 pnpm setup

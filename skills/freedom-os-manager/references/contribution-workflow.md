@@ -7,7 +7,7 @@
 ### 团队 skills 仓库
 
 ```bash
-cd ~/Code/github.com/way2freedom/skills
+cd ~/Code/github.com/way2freedom/freedom-os
 git status --short
 git fetch origin
 git checkout v3
