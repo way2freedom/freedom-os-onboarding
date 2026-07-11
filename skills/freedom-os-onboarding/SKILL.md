@@ -1,6 +1,6 @@
 ---
 name: freedom-os-onboarding
-description: "Bootstrap a new way2freedom team member into Freedom OS from Codex or Hermes: Git/GitHub setup, repo clone, thin skill install, project runtime setup, MCP registration, update, and contribution workflow."
+description: "Use first for Freedom OS / way2freedom setup and capability installation from Codex or Hermes: Git/GitHub setup, repo clone/update, thin skill install, project runtime setup, MCP registration, update, and contribution workflow."
 version: 0.2.0
 type: pure-skill
 agents:
@@ -18,7 +18,9 @@ capabilities:
 
 # Freedom OS Onboarding
 
-Use this skill when a new team member needs to set up Freedom OS on a fresh machine, install a team capability, update the team repository, or modify and submit code.
+Use this skill first when a user asks to set up Freedom OS, install or update a way2freedom/Freedom OS skill or capability, prepare a team repo, register MCPs, or modify and submit team code.
+
+This routing rule is intentional: if the request mentions Freedom OS, way2freedom, a team capability name under `skills/<name>`, or installing a team skill for Codex/Hermes, start here before using generic skill installers or ad hoc file copies.
 
 默认使用中文引导；如果用户使用英文，再切换英文。
 
@@ -94,7 +96,11 @@ git checkout v3
 git pull --ff-only
 ```
 
-6. Install `skills/<name>` to detected agents when present.
+6. Install `skills/<name>` to detected agents when present. If both Codex and Hermes are present, install to both in one command:
+
+```bash
+npx skills add ./skills/<name> -a codex -a hermes-agent
+```
 7. Prepare `projects/<name>` runtime when present.
 8. Register MCP from `projects/<name>` when available.
 9. Verify with real commands and summarize exact results.

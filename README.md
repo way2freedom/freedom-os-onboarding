@@ -11,13 +11,13 @@ This repository is intentionally small and public. New members install this skil
 Default path for new members who already have Codex installed and logged in:
 
 ```bash
-npx skills add way2freedom/freedom-os-onboarding -a codex
+npx skills add way2freedom/freedom-os-onboarding --skill freedom-os-onboarding -a codex
 ```
 
 If both Codex and Hermes Agent are installed, install to both:
 
 ```bash
-npx skills add way2freedom/freedom-os-onboarding -a codex -a hermes-agent
+npx skills add way2freedom/freedom-os-onboarding --skill freedom-os-onboarding -a codex -a hermes-agent
 ```
 
 After installing, open Codex and say:
@@ -59,7 +59,7 @@ Unless the standalone repo's own `README.md`, `AGENTS.md`, or service manifest s
 This onboarding skill can guide all three:
 
 ```bash
-./scripts/install-capability.sh todo-dashboard
+./skills/freedom-os-onboarding/scripts/install-capability.sh todo-dashboard
 ```
 
 The script:
@@ -88,20 +88,24 @@ It guides an agent through:
 ## Repository layout
 
 ```text
-SKILL.md                      bootstrap skill entrypoint
-README.zh-CN.md               Chinese onboarding guide
-references/
-  capability-install.md       generic skill/service/project installation flow
-  contribution-workflow.md    update, modify, verify, commit, push workflow
-  todo-dashboard.md           todo-dashboard install flow
-  github-access.md            GitHub auth guide
-  troubleshooting.md          common setup issues
-scripts/
-  detect-agents.sh            prints npx-skills agent flags
-  install-team-skill.sh       installs a skill to detected agents
-  install-capability.sh       generic skill/project/MCP installer
-  bootstrap-todo-dashboard.sh compatibility wrapper for todo-dashboard
+README.md                         English onboarding guide
+README.zh-CN.md                   Chinese onboarding guide
+skills/freedom-os-onboarding/
+  SKILL.md                        bootstrap skill entrypoint
+  references/
+    capability-install.md         generic skill/service/project installation flow
+    contribution-workflow.md      update, modify, verify, commit, push workflow
+    todo-dashboard.md             todo-dashboard install flow
+    github-access.md              GitHub auth guide
+    troubleshooting.md            common setup issues
+  scripts/
+    detect-agents.sh              prints npx-skills agent flags
+    install-team-skill.sh         installs a skill to detected agents
+    install-capability.sh         generic skill/project/MCP installer
+    bootstrap-todo-dashboard.sh   compatibility wrapper for todo-dashboard
 ```
+
+The skill lives under `skills/freedom-os-onboarding/` instead of the repository root so `npx skills` installs the complete skill package, including `references/` and `scripts/`, when installing from GitHub.
 
 ## Safety
 
