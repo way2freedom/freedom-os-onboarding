@@ -15,6 +15,7 @@ echo
 echo "== Installed Capabilities By Platform =="
 python3 - "$repo_root/.freedom-os/registry/capabilities.json" <<'PY'
 import json
+import hashlib
 import shutil
 import subprocess
 import sys
@@ -104,6 +105,34 @@ def shorten(text: str, width: int = 48) -> str:
     return text[: max(0, width - 1)] + "…"
 
 
+def file_hash(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def source_skill_file(record: dict):
+    skill = record.get("paths", {}).get("skill")
+    install_dir = record.get("paths", {}).get("install_dir")
+    if not skill:
+        return None
+    path = Path(skill)
+    if not path.is_absolute() and install_dir:
+        path = Path(install_dir) / path
+    skill_md = path / "SKILL.md"
+    return skill_md if skill_md.exists() else None
+
+
+def sync_status(name: str, record: dict) -> str:
+    source = source_skill_file(record)
+    installed = Path.home() / ".agents" / "skills" / name / "SKILL.md"
+    if source is None or not installed.exists():
+        return "n/a"
+    return "ok" if file_hash(source) == file_hash(installed) else "drift"
+
+
 registry_path = Path(sys.argv[1])
 if not registry_path.exists():
     print(f"registry not found: {registry_path}")
@@ -123,21 +152,23 @@ for name, record in sorted(records.items()):
         continue
     codex = platform_status(name in local_skills, name in codex_mcp)
     hermes = platform_status(name in hermes_skills or name in local_skills, name in hermes_mcp)
-    normal.append((name, record.get("type", "unknown"), codex, hermes, read_description(record)))
+    normal.append((name, record.get("type", "unknown"), codex, hermes, sync_status(name, record), read_description(record)))
 
-print("{:<30} {:<16} {:<16} {:<16} {}".format("CAPABILITY", "TYPE", "CODEX", "HERMES", "DESCRIPTION"))
-for name, type_, codex, hermes, description in normal:
-    print("{:<30} {:<16} {:<16} {:<16} {}".format(name[:30], type_[:16], codex, hermes, shorten(description)))
+print("{:<30} {:<16} {:<16} {:<16} {:<8} {}".format("CAPABILITY", "TYPE", "CODEX", "HERMES", "SYNC", "DESCRIPTION"))
+for name, type_, codex, hermes, sync, description in normal:
+    print("{:<30} {:<16} {:<16} {:<16} {:<8} {}".format(name[:30], type_[:16], codex, hermes, sync, shorten(description)))
 
 if lark_names:
     codex_count = sum(1 for name in lark_names if name in local_skills)
     hermes_count = sum(1 for name in lark_names if name in hermes_skills or name in local_skills)
     print(
-        "{:<30} {:<16} {:<16} {}".format(
+        "{:<30} {:<16} {:<16} {:<16} {:<8} {}".format(
             f"lark-* ({len(lark_names)})",
             "pure-skill",
             f"skill x{codex_count}" if codex_count else "-",
-            f"{f'skill x{hermes_count}' if hermes_count else '-':<16} Lark / Feishu local workflow skills",
+            f"skill x{hermes_count}" if hermes_count else "-",
+            "n/a",
+            "Lark / Feishu local workflow skills",
         )
     )
     print("  " + ", ".join(lark_names))
@@ -147,14 +178,15 @@ extra_hermes_mcp = sorted(hermes_mcp - set(records))
 if extra_codex_mcp or extra_hermes_mcp:
     print()
     print("== Other Registered MCP ==", flush=True)
-    print("{:<30} {:<16} {:<16} {:<16} {}".format("NAME", "TYPE", "CODEX", "HERMES", "DESCRIPTION"))
+    print("{:<30} {:<16} {:<16} {:<16} {:<8} {}".format("NAME", "TYPE", "CODEX", "HERMES", "SYNC", "DESCRIPTION"))
     for name in sorted(set(extra_codex_mcp) | set(extra_hermes_mcp)):
         print(
-            "{:<30} {:<16} {:<16} {:<16} {}".format(
+            "{:<30} {:<16} {:<16} {:<16} {:<8} {}".format(
                 name[:30],
                 "external",
                 "mcp" if name in extra_codex_mcp else "-",
                 "mcp" if name in extra_hermes_mcp else "-",
+                "n/a",
                 "external MCP",
             )
         )

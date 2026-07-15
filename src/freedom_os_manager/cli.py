@@ -101,7 +101,8 @@ def cmd_check_installed(registry: CapabilityRegistry, repo_root: Path, local_ski
     print(f"matching={len(diff['matching'])}")
     print_names("missing_in_registry", diff["missing_in_registry"])
     print_names("stale_in_registry", diff["stale_in_registry"])
-    has_diff = bool(diff["missing_in_registry"] or diff["stale_in_registry"])
+    print_names("drifted_installs", diff["drifted_installs"])
+    has_diff = bool(diff["missing_in_registry"] or diff["stale_in_registry"] or diff["drifted_installs"])
     if fix:
         cmd_sync_installed(registry, repo_root, local_skill_root)
         return 0

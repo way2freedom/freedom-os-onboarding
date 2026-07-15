@@ -267,6 +267,44 @@ class CliTests(unittest.TestCase):
             self.assertIn("missing_in_registry=0", output)
             self.assertNotIn("node_repl", output)
 
+    def test_check_installed_reports_skill_copy_drift(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir) / "repo"
+            local_skills = Path(temp_dir) / "installed-skills"
+            registry = Path(temp_dir) / ".freedom-os" / "registry" / "capabilities.json"
+            write(root / "skills" / "demo" / "SKILL.md", "---\nname: demo\n---\nsource\n")
+            write(local_skills / "demo" / "SKILL.md", "---\nname: demo\n---\ninstalled drift\n")
+
+            with mock.patch("freedom_os_manager.installed.installed_mcp_names", return_value=set()):
+                run_cli(
+                    [
+                        "--repo-root",
+                        str(root),
+                        "--registry",
+                        str(registry),
+                        "capabilities",
+                        "sync-installed",
+                        "--local-skill-root",
+                        str(local_skills),
+                    ]
+                )
+                code, output = run_cli(
+                    [
+                        "--repo-root",
+                        str(root),
+                        "--registry",
+                        str(registry),
+                        "capabilities",
+                        "check-installed",
+                        "--local-skill-root",
+                        str(local_skills),
+                    ]
+                )
+
+            self.assertEqual(code, 1)
+            self.assertIn("drifted_installs=1", output)
+            self.assertIn("- demo", output)
+
     def test_agent_adapter_turns_npx_timeout_into_failed_result(self):
         with mock.patch("freedom_os_manager.adapters.agents.subprocess.run", side_effect=TimeoutExpired(cmd=["npx"], timeout=30)):
             result = agents.install_skill(Path("/tmp/demo-skill"), ["codex"])

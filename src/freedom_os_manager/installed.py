@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 import shutil
 import subprocess
@@ -63,7 +64,43 @@ def compare_installed_registry(
         "missing_in_registry": sorted(local - registry),
         "stale_in_registry": sorted(registry - local),
         "matching": sorted(local & registry),
+        "drifted_installs": drifted_installs(skill_root, capabilities),
     }
+
+
+def drifted_installs(skill_root: Path, capabilities: dict[str, dict[str, Any]]) -> list[str]:
+    drifted: list[str] = []
+    for name, record in sorted(capabilities.items()):
+        source_skill = source_skill_file(record)
+        installed_skill = skill_root / name / "SKILL.md"
+        if source_skill is None or not installed_skill.exists():
+            continue
+        if file_sha256(source_skill) != file_sha256(installed_skill):
+            drifted.append(name)
+    return drifted
+
+
+def source_skill_file(record: dict[str, Any]) -> Path | None:
+    paths = record.get("paths", {})
+    skill = paths.get("skill")
+    install_dir = paths.get("install_dir")
+    if not skill:
+        return None
+    skill_path = Path(skill)
+    if not skill_path.is_absolute():
+        if not install_dir:
+            return None
+        skill_path = Path(install_dir) / skill_path
+    candidate = skill_path / "SKILL.md"
+    return candidate if candidate.exists() else None
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def installed_mcp_names() -> set[str]:
