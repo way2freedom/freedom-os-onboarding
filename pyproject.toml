@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "freedom-os-manager"
+version = "0.1.0"
+description = "Local Freedom OS capability registry and manager."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "way2freedom" }]
+dependencies = []
+
+[project.scripts]
+freedom-os = "freedom_os_manager.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

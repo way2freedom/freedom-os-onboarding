@@ -109,6 +109,54 @@ git push origin <branch>
 
 详细规则见：`skills/freedom-os-manager/references/contribution-workflow.md`。
 
+## Capability Registry MVP
+
+本仓库现在也包含一个轻量的 Freedom OS Capability Registry 本机 CLI。它和 `way2freedom/freedom-os` 仓库分开实现，源码位于当前仓库的 `src/freedom_os_manager/`。
+
+本机 registry 默认写入：
+
+```text
+.freedom-os/registry/capabilities.json
+```
+
+该路径已被 Git 忽略，用来记录本机发现的能力、安装状态、分层状态和 doctor 检查结果，不保存 secret。
+
+在本仓库根目录运行：
+
+```bash
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities scan
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities sync-installed --repo-root /Users/winston/Code/github.com/way2freedom/freedom-os
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities check-installed
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities list
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities status freedom-os-manager
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities doctor freedom-os-manager
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities install freedom-os-manager --dry-run
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities uninstall freedom-os-manager
+```
+
+短别名：
+
+```bash
+PYTHONPATH=src python3 -m freedom_os_manager.cli cap list
+```
+
+MVP 行为：
+
+- `scan` 发现 `skills/*/SKILL.md`、`services/*/README.md`、`projects/*/README.md`。
+- `sync-installed` 从 `~/.agents/skills` 保存本机已安装能力快照，只用仓库扫描补充已知类型和路径；仓库里存在但本机没有安装的能力会被排除。
+- `check-installed` 对比 `~/.agents/skills` 和 registry；有差异时返回非零。加 `--fix` 会用本机已安装快照替换 registry。
+- 类型推断区分 `pure-skill`、`mcp-service`、`hybrid-service`、`standalone-repo`。
+- `status` 区分 Agent skill 安装、runtime ready、MCP registered。
+- `doctor` 只做只读检查，只会更新 registry 中的最近检查结果。
+- `install` 支持把内置 skill 安装到检测到的 Codex 和 Hermes Agent；加 `--dry-run` 可只预览命令，不改 Agent 配置。
+- `uninstall` 默认只预览并把 registry 标记为 `disabled`。传入 `--execute` 后才会通过 `npx skills remove` 移除 Agent skill 登记；源码、运行时数据、凭据和导出文件都不会被删除。
+
+测试命令：
+
+```bash
+PYTHONPATH=src python3 -m unittest discover -s tests
+```
+
 ## 安全规则
 
 - 不要把 token、私钥、密码、Cookie 粘贴到聊天里。

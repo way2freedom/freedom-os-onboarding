@@ -85,11 +85,62 @@ It guides an agent through:
 9. Updating the team repository safely.
 10. Committing and pushing changes only after explicit user request and verification.
 
+## Capability Registry MVP
+
+This repository also contains a small local CLI runtime for the Freedom OS Capability Registry. It is intentionally separate from `way2freedom/freedom-os`; source lives in this repository under `src/freedom_os_manager/`.
+
+The registry stores local machine state in:
+
+```text
+.freedom-os/registry/capabilities.json
+```
+
+That path is ignored by Git. It records discovered capabilities, install state, layered status, and last doctor results without storing secrets.
+
+Run from this repository:
+
+```bash
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities scan
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities sync-installed --repo-root /Users/winston/Code/github.com/way2freedom/freedom-os
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities check-installed
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities list
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities status freedom-os-manager
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities doctor freedom-os-manager
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities install freedom-os-manager --dry-run
+PYTHONPATH=src python3 -m freedom_os_manager.cli capabilities uninstall freedom-os-manager
+```
+
+Short alias:
+
+```bash
+PYTHONPATH=src python3 -m freedom_os_manager.cli cap list
+```
+
+MVP behavior:
+
+- `scan` discovers `skills/*/SKILL.md`, `services/*/README.md`, and `projects/*/README.md`.
+- `sync-installed` saves a local installed-capability snapshot from `~/.agents/skills`, using the repository scan only to enrich known types and paths. Repository capabilities that are not installed locally are omitted.
+- `check-installed` compares `~/.agents/skills` with the registry and exits nonzero when they differ. Add `--fix` to replace the registry with the local installed snapshot.
+- Type inference distinguishes `pure-skill`, `mcp-service`, `hybrid-service`, and `standalone-repo`.
+- `status` separates Agent skill install state, runtime readiness, and MCP registration.
+- `doctor` performs read-only local checks and writes only the registry's last check result.
+- `install` supports built-in skills for detected Codex and Hermes agents; use `--dry-run` to preview without changing agent config.
+- `uninstall` defaults to preview plus a `disabled` registry mark. Pass `--execute` to remove agent skill registration through `npx skills remove`; source files, runtime data, credentials, and exports are never deleted.
+
+Run tests with:
+
+```bash
+PYTHONPATH=src python3 -m unittest discover -s tests
+```
+
 ## Repository layout
 
 ```text
 README.md                         English manager guide
 README.zh-CN.md                   Chinese manager guide
+pyproject.toml                    Python CLI package metadata
+src/freedom_os_manager/           Capability Registry CLI/runtime
+tests/                            Registry, scanner, and CLI tests
 skills/freedom-os-manager/
   SKILL.md                        bootstrap skill entrypoint
   references/
