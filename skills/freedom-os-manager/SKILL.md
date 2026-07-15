@@ -103,7 +103,15 @@ npx skills add ./skills/<name> -a codex -a hermes-agent
 ```
 7. Prepare `projects/<name>` runtime when present.
 8. Register MCP from `projects/<name>` when available.
-9. Verify with real commands and summarize exact results.
+9. Record every completed install through Freedom OS Manager registry. Do this for skill, MCP, hybrid, and project-only capabilities:
+
+```bash
+PYTHONPATH=src python3 -m freedom_os_manager.cli --repo-root ~/Code/github.com/way2freedom/freedom-os capabilities install <name>
+PYTHONPATH=src python3 -m freedom_os_manager.cli --repo-root ~/Code/github.com/way2freedom/freedom-os capabilities check-installed --fix
+PYTHONPATH=src python3 -m freedom_os_manager.cli --repo-root ~/Code/github.com/way2freedom/freedom-os capabilities check-installed
+```
+
+10. Verify with real commands and summarize exact results. Do not treat a capability as installed until the runtime and registry state have both been checked.
 
 Detailed procedure: `references/capability-install.md`.
 

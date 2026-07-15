@@ -103,6 +103,86 @@ class CliTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertIn("status: broken", output)
 
+    def test_install_records_project_only_capability(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir) / "repo"
+            registry = Path(temp_dir) / ".freedom-os" / "registry" / "capabilities.json"
+            write(root / "projects" / "convertible-bond-ipo" / "README.md")
+
+            code, output = run_cli(
+                [
+                    "--repo-root",
+                    str(root),
+                    "--registry",
+                    str(registry),
+                    "capabilities",
+                    "install",
+                    "convertible-bond-ipo",
+                ]
+            )
+
+            self.assertEqual(code, 0)
+            self.assertIn("runtime_prepared=True", output)
+
+            code, output = run_cli(["--repo-root", str(root), "--registry", str(registry), "capabilities", "status", "convertible-bond-ipo"])
+            self.assertEqual(code, 0)
+            self.assertIn("status: installed", output)
+            self.assertIn("prepared: True", output)
+
+            with mock.patch("freedom_os_manager.installed.installed_mcp_names", return_value=set()):
+                code, output = run_cli(
+                    [
+                        "--repo-root",
+                        str(root),
+                        "--registry",
+                        str(registry),
+                        "capabilities",
+                        "check-installed",
+                        "--local-skill-root",
+                        str(Path(temp_dir) / "installed-skills"),
+                    ]
+                )
+            self.assertEqual(code, 0)
+            self.assertIn("matching=1", output)
+
+            with mock.patch("freedom_os_manager.installed.installed_mcp_names", return_value=set()):
+                code, output = run_cli(
+                    [
+                        "--repo-root",
+                        str(root),
+                        "--registry",
+                        str(registry),
+                        "capabilities",
+                        "sync-installed",
+                        "--local-skill-root",
+                        str(Path(temp_dir) / "installed-skills"),
+                    ]
+                )
+            self.assertEqual(code, 0)
+            self.assertIn("Installed capabilities saved: 1", output)
+            self.assertIn("convertible-bond-ipo", output)
+
+            with mock.patch("freedom_os_manager.installed.installed_mcp_names", return_value={"convertible-bond-ipo"}):
+                code, output = run_cli(
+                    [
+                        "--repo-root",
+                        str(root),
+                        "--registry",
+                        str(registry),
+                        "capabilities",
+                        "sync-installed",
+                        "--local-skill-root",
+                        str(Path(temp_dir) / "installed-skills"),
+                    ]
+                )
+            self.assertEqual(code, 0)
+            self.assertIn("Installed capabilities saved: 1", output)
+
+            code, output = run_cli(["--repo-root", str(root), "--registry", str(registry), "capabilities", "status", "convertible-bond-ipo"])
+            self.assertEqual(code, 0)
+            self.assertIn("prepared: True", output)
+            self.assertIn("registered: True", output)
+
     def test_sync_installed_replaces_registry_with_local_installed_skills_only(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir) / "repo"

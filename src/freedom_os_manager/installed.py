@@ -49,8 +49,34 @@ def registry_installed_names(capabilities: dict[str, dict[str, Any]]) -> set[str
         and (
             any(agent.get("installed") for agent in record.get("agents", {}).values() if isinstance(agent, dict))
             or record.get("mcp", {}).get("registered")
+            or record.get("runtime", {}).get("prepared")
         )
     }
+
+
+def prepared_project_names(capabilities: dict[str, dict[str, Any]]) -> set[str]:
+    names: set[str] = set()
+    for name, record in capabilities.items():
+        if not record.get("runtime", {}).get("prepared"):
+            continue
+        project_path = resolved_project_path(record)
+        if project_path is not None and project_path.is_dir():
+            names.add(name)
+    return names
+
+
+def resolved_project_path(record: dict[str, Any]) -> Path | None:
+    paths = record.get("paths", {})
+    project = paths.get("project")
+    install_dir = paths.get("install_dir")
+    if not project:
+        return None
+    project_path = Path(project)
+    if not project_path.is_absolute():
+        if not install_dir:
+            return None
+        project_path = Path(install_dir) / project_path
+    return project_path
 
 
 def compare_installed_registry(
@@ -58,7 +84,7 @@ def compare_installed_registry(
     capabilities: dict[str, dict[str, Any]],
     known_mcp_names: set[str] | None = None,
 ) -> dict[str, list[str]]:
-    local = installed_names(skill_root, known_mcp_names)
+    local = installed_names(skill_root, known_mcp_names) | prepared_project_names(capabilities)
     registry = registry_installed_names(capabilities)
     return {
         "missing_in_registry": sorted(local - registry),

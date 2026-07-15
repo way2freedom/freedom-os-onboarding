@@ -81,16 +81,37 @@ def cmd_scan(registry: CapabilityRegistry, repo_root: Path) -> int:
 
 def cmd_sync_installed(registry: CapabilityRegistry, repo_root: Path, local_skill_root: Path) -> int:
     discovered = discover_capabilities(repo_root) if repo_root.exists() else []
+    existing_records = {name: dict(record) for name, record in registry.capabilities.items()}
     records = discover_installed_skills(local_skill_root, discovered)
     registry.data["capabilities"] = {}
     for record in records:
+        preserve_runtime_state(existing_records.get(record["name"]), record)
         registry.upsert(record)
+    for name, record in existing_records.items():
+        if record.get("runtime", {}).get("prepared") and name not in registry.capabilities:
+            registry.upsert(record)
     registry.save()
     print(f"Synced installed skills from {local_skill_root}")
-    print(f"Installed capabilities saved: {len(records)}")
-    for record in records:
+    saved_records = sorted(registry.capabilities.values(), key=lambda item: item["name"])
+    print(f"Installed capabilities saved: {len(saved_records)}")
+    for record in saved_records:
         print(f"- {record['name']}: {record['type']}")
     return 0
+
+
+def preserve_runtime_state(existing: dict[str, Any] | None, incoming: dict[str, Any]) -> None:
+    if not existing:
+        return
+    existing_runtime = existing.get("runtime", {})
+    if not existing_runtime.get("prepared"):
+        return
+    runtime = dict(incoming.get("runtime", {}))
+    runtime["prepared"] = True
+    for key in ("doctor_command", "last_doctor_status", "last_checked_at"):
+        if existing_runtime.get(key) and not runtime.get(key):
+            runtime[key] = existing_runtime[key]
+    incoming["runtime"] = runtime
+    incoming["installed_at"] = incoming.get("installed_at") or existing.get("installed_at")
 
 
 def cmd_check_installed(registry: CapabilityRegistry, repo_root: Path, local_skill_root: Path, *, fix: bool) -> int:
@@ -154,6 +175,29 @@ def cmd_install(registry: CapabilityRegistry, repo_root: Path, name: str, *, dry
     record = ensure_scanned(registry, repo_root, name)
     skill_path = record.get("paths", {}).get("skill")
     if not skill_path:
+        project_path = record.get("paths", {}).get("project")
+        if project_path:
+            absolute_project_path = repo_root / project_path
+            if dry_run:
+                print("project_only=true")
+                print(f"project_path={absolute_project_path}")
+                print("dry_run=true")
+                return 0
+            runtime = record.setdefault("runtime", {})
+            runtime["prepared"] = absolute_project_path.is_dir()
+            record["installed_at"] = record.get("installed_at") or now_iso()
+            record["status"] = "installed" if runtime["prepared"] else "broken"
+            notes = list(record.get("notes", []))
+            if "installed_project_only_capability" not in notes:
+                notes.append("installed_project_only_capability")
+            record["notes"] = notes
+            registry.upsert(record)
+            registry.save()
+            print(f"Capability has no builtin skill layer: {name}")
+            print(f"project_path={absolute_project_path}")
+            print(f"runtime_prepared={runtime['prepared']}")
+            print("install_exit_code=0" if runtime["prepared"] else "install_exit_code=1")
+            return 0 if runtime["prepared"] else 1
         record["status"] = "partial"
         registry.upsert(record)
         registry.save()
@@ -252,11 +296,9 @@ def ensure_scanned(registry: CapabilityRegistry, repo_root: Path, name: str) -> 
     if record is not None:
         return record
     for discovered in discover_capabilities(repo_root):
-        registry.upsert(discovered)
-    record = registry.get(name)
-    if record is None:
-        raise SystemExit(f"Capability not found in repository or registry: {name}")
-    return record
+        if discovered["name"] == name:
+            return registry.upsert(discovered)
+    raise SystemExit(f"Capability not found in repository or registry: {name}")
 
 
 def print_status(record: dict[str, Any]) -> None:

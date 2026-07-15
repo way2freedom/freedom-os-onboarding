@@ -65,19 +65,53 @@ def parse_hermes_mcp(output: str) -> set[str]:
     return names
 
 
-def platform_status(skill: bool, mcp: bool) -> str:
+def platform_status(skill: bool, mcp: bool, runtime: bool = False) -> str:
     labels = []
     if skill:
         labels.append("skill")
     if mcp:
         labels.append("mcp")
+    if runtime:
+        labels.append("runtime")
     return "+".join(labels) if labels else "-"
+
+
+def project_path(record: dict):
+    project = record.get("paths", {}).get("project")
+    install_dir = record.get("paths", {}).get("install_dir")
+    if not project:
+        return None
+    path = Path(project)
+    if not path.is_absolute() and install_dir:
+        path = Path(install_dir) / path
+    return path
+
+
+def project_prepared(record: dict) -> bool:
+    if not record.get("runtime", {}).get("prepared"):
+        return False
+    path = project_path(record)
+    return bool(path and path.is_dir())
 
 
 def read_description(record: dict) -> str:
     skill = record.get("paths", {}).get("skill")
     install_dir = record.get("paths", {}).get("install_dir")
     if not skill:
+        path = project_path(record)
+        service_json = path / "service.json" if path else None
+        if service_json and service_json.exists():
+            try:
+                value = json.loads(service_json.read_text(encoding="utf-8")).get("description")
+            except json.JSONDecodeError:
+                value = None
+            if value:
+                return " ".join(str(value).split())
+        pyproject = path / "pyproject.toml" if path else None
+        if pyproject and pyproject.exists():
+            value = read_pyproject_description(pyproject)
+            if value:
+                return " ".join(str(value).split())
         return ""
     path = Path(skill)
     if not path.is_absolute() and install_dir:
@@ -97,6 +131,21 @@ def read_description(record: dict) -> str:
             value = stripped.split(":", 1)[1].strip().strip("\"'")
             return " ".join(value.split())
     return ""
+
+
+def read_pyproject_description(path: Path):
+    in_project = False
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped == "[project]":
+            in_project = True
+            continue
+        if in_project and stripped.startswith("["):
+            break
+        if in_project and stripped.startswith("description"):
+            _, value = stripped.split("=", 1)
+            return value.strip().strip("\"'")
+    return None
 
 
 def shorten(text: str, width: int = 48) -> str:
@@ -150,8 +199,9 @@ for name, record in sorted(records.items()):
     if name.startswith("lark-"):
         lark_names.append(name)
         continue
-    codex = platform_status(name in local_skills, name in codex_mcp)
-    hermes = platform_status(name in hermes_skills or name in local_skills, name in hermes_mcp)
+    prepared = project_prepared(record)
+    codex = platform_status(name in local_skills, name in codex_mcp, prepared)
+    hermes = platform_status(name in hermes_skills or name in local_skills, name in hermes_mcp, prepared)
     normal.append((name, record.get("type", "unknown"), codex, hermes, sync_status(name, record), read_description(record)))
 
 print("{:<30} {:<16} {:<16} {:<16} {:<8} {}".format("CAPABILITY", "TYPE", "CODEX", "HERMES", "SYNC", "DESCRIPTION"))
