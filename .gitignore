@@ -2,8 +2,6 @@ node_modules/
 .DS_Store
 .env
 *.log
-.freedom-os/
 .agents/
-skills-lock.json
 __pycache__/
 *.py[cod]

@@ -100,4 +100,4 @@ Do not continue into arbitrary capability installation, MCP registration, or pro
 
 ## Update and contribution flow
 
-When the user asks to update, modify, commit, or push launcher code, follow the repo's contribution workflow and keep changes scoped.
+When the user asks to update, modify, commit, or push launcher code, keep changes scoped to this bootstrap repository.
